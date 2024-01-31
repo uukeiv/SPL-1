@@ -97,27 +97,34 @@ orderCounter(other.orderCounter)
 {
     for (Order *order:other.pendingOrders) {
         pendingOrders.push_back(order);
+        order = nullptr;
     }
 
     for (Order *order:other.inProcessOrders) {
         inProcessOrders.push_back(order);
+        order = nullptr;
     }
 
     for (Order *order:other.completedOrders) {
         completedOrders.push_back(order);
+        order = nullptr;
     }
 
     for (Volunteer *vol:other.volunteers) {
         volunteers.push_back(vol);
+        vol = nullptr;
     }
 
     for (Customer *cust:other.customers) {
         customers.push_back(cust);
+        cust = nullptr;
     }
 
     for (BaseAction *act:other.actionsLog) {
         actionsLog.push_back(act);
+        act = nullptr;
     }
+
 }
 
 // Destructor
@@ -173,26 +180,32 @@ WareHouse &WareHouse::operator=(const WareHouse &&other) {
 
         for (Order *order:other.pendingOrders) {
             pendingOrders.push_back(order);
+            order = nullptr;
         }
 
         for (Order *order:other.inProcessOrders) {
             inProcessOrders.push_back(order);
+            order = nullptr;
         }
 
         for (Order *order:other.completedOrders) {
             completedOrders.push_back(order);
+            order = nullptr;
         }
 
         for (Volunteer *vol:other.volunteers) {
             volunteers.push_back(vol);
+            vol = nullptr;
         }
 
         for (Customer *cust:other.customers) {
             customers.push_back(cust);
+            cust = nullptr;
         }
 
         for (BaseAction *act:other.actionsLog) {
             actionsLog.push_back(act);
+            act = nullptr;
         }
     }
 
