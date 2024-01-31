@@ -28,10 +28,12 @@ class WareHouse {
         void close();
         void open();
 
-        // rule of 3
+        // rule of 5
         virtual ~WareHouse();
-        WareHouse(const WareHouse &other);
-        WareHouse& operator=(const WareHouse &other);
+        WareHouse(const WareHouse &other); // Copy constructor
+        WareHouse& operator=(const WareHouse &other); // Assignmet constructor 
+        WareHouse& operator=(const WareHouse &&other); // Move assignment 
+        WareHouse (const WareHouse &&other);// Move copy
 
         // Custom methods
         int newCustomerId(); // Returns an available ID for a new customer, increments customerCounter by 1.
@@ -49,6 +51,7 @@ class WareHouse {
         vector<Volunteer*>& getVolunteers(); //Returns a reference of the Vector with all volunteers.
         void printOrders() const; // Prints all the orders.
         void printActions() const;// Prints all previous made actions
+
 
     private:
         bool isOpen;

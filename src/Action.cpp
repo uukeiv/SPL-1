@@ -326,8 +326,7 @@ Close::Close(){}
 
 void Close::act(WareHouse &wareHouse) {
     wareHouse.printOrders();
-
-    //we don't add the current action to the action list because all the data are about to get deleted anyway.
+    wareHouse.addAction(this);
     wareHouse.freeResources();
     wareHouse.close();
 }
@@ -381,7 +380,6 @@ void RestoreWareHouse::act(WareHouse &wareHouse) {
         wareHouse = *backup;
     }
 
-    //wareHouse.addAction(this); // might worth to ask but i think this should never apear in the log since its done just before going to the previous backup
 }
 
 RestoreWareHouse * RestoreWareHouse::clone() const {

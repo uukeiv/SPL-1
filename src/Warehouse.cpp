@@ -4,6 +4,7 @@
 #include <fstream>
 
 extern WareHouse* backup;
+// Builder
 WareHouse::WareHouse(const string &configFilePath):
     isOpen(false), actionsLog(), volunteers(), pendingOrders(), inProcessOrders(),
     completedOrders(), customers(), customerCounter(0), volunteerCounter(0), orderCounter(0)
@@ -24,33 +25,33 @@ WareHouse::WareHouse(const string &configFilePath):
                 continue;
             // Customer
             if ((split[0] == "customer")) {
-                addCustomer(split[1], split[2],stoi(split[3]), stoi(split[4]));
+                addCustomer(split[1], split[2],stoi(split[3]), stoi(split[4])); // Name,Type,Distance,MaxOrders
             } 
             // Regular Collector
             if ((split[0] == "volunteer") && (split[2] == "collector")) {
                 int id = newVolunteerId();
-                addVolunteer(new CollectorVolunteer(id,split[1],stoi(split[3])));
+                addVolunteer(new CollectorVolunteer(id,split[1],stoi(split[3])));// Id,Name,Cooldown
                 continue;
             }
 
             // Limited Collector
             if ((split[0] == "volunteer") && (split[2] == "limited_collector") ) {
                 int id = newVolunteerId();
-                addVolunteer(new LimitedCollectorVolunteer(id,split[1],stoi(split[3]),stoi(split[4])));
+                addVolunteer(new LimitedCollectorVolunteer(id,split[1],stoi(split[3]),stoi(split[4])));// Id,Name,Cooldown,MaxOrders
                 continue;
             }
 
             // Regular Driver
             if ((split[0] == "volunteer") && (split[2] == "driver") ) {
                 int id = newVolunteerId();
-                addVolunteer(new DriverVolunteer(id,split[1],stoi(split[3]),stoi(split[4])));
+                addVolunteer(new DriverVolunteer(id,split[1],stoi(split[3]),stoi(split[4])));// Id,Name,MaxDistance,DistancePerStep
                 continue;
             }
 
             // Limited Driver
             if ((split[0] == "volunteer") && (split[2] == "limited_driver")) {
                 int id = newVolunteerId();
-                addVolunteer(new LimitedDriverVolunteer(id,split[1],stoi(split[3]),stoi(split[4]),stoi(split[5])));
+                addVolunteer(new LimitedDriverVolunteer(id,split[1],stoi(split[3]),stoi(split[4]),stoi(split[5])));// Id,Name,MaxDistance,DistancePerStep,MaxOrders
                 continue;
             }
         }
@@ -58,6 +59,7 @@ WareHouse::WareHouse(const string &configFilePath):
     }
 }
 
+// Copy constructor
 WareHouse::WareHouse(const WareHouse &other):
 isOpen(other.isOpen),actionsLog(),volunteers(),pendingOrders(),inProcessOrders(),
 completedOrders(),customers(),customerCounter(other.customerCounter),volunteerCounter(other.volunteerCounter),orderCounter(other.orderCounter)
@@ -87,10 +89,43 @@ completedOrders(),customers(),customerCounter(other.customerCounter),volunteerCo
     }
 }
 
+// Move copy
+WareHouse::WareHouse(const WareHouse &&other):
+isOpen(other.isOpen),actionsLog(),volunteers(),pendingOrders(),inProcessOrders(),
+completedOrders(),customers(),customerCounter(other.customerCounter),volunteerCounter(other.volunteerCounter),
+orderCounter(other.orderCounter)
+{
+    for (Order *order:other.pendingOrders) {
+        pendingOrders.push_back(order);
+    }
+
+    for (Order *order:other.inProcessOrders) {
+        inProcessOrders.push_back(order);
+    }
+
+    for (Order *order:other.completedOrders) {
+        completedOrders.push_back(order);
+    }
+
+    for (Volunteer *vol:other.volunteers) {
+        volunteers.push_back(vol);
+    }
+
+    for (Customer *cust:other.customers) {
+        customers.push_back(cust);
+    }
+
+    for (BaseAction *act:other.actionsLog) {
+        actionsLog.push_back(act);
+    }
+}
+
+// Destructor
 WareHouse::~WareHouse(){
     freeResources();
 }
 
+// Assignmet constructor
 WareHouse &WareHouse::operator=(const WareHouse &other) {
     if (this != &other) {
         freeResources();
@@ -98,33 +133,73 @@ WareHouse &WareHouse::operator=(const WareHouse &other) {
         customerCounter = other.customerCounter;
         volunteerCounter = other.volunteerCounter;
         orderCounter = other.orderCounter;
-        for (Order *o:other.pendingOrders) {
-            pendingOrders.push_back(o->clone());
+
+        for (Order *order:other.pendingOrders) {
+            pendingOrders.push_back(order->clone());
         }
 
-        for (Order *o:other.inProcessOrders) {
-            inProcessOrders.push_back(o->clone());
+        for (Order *order:other.inProcessOrders) {
+            inProcessOrders.push_back(order->clone());
         }
 
-        for (Order *o:other.completedOrders) {
-            completedOrders.push_back(o->clone());
+        for (Order *order:other.completedOrders) {
+            completedOrders.push_back(order->clone());
         }
 
-        for (Volunteer *v:other.volunteers) {
-            volunteers.push_back(v->clone());
+        for (Volunteer *vol:other.volunteers) {
+            volunteers.push_back(vol->clone());
         }
 
-        for (Customer *c:other.customers) {
-            customers.push_back(c->clone());
+        for (Customer *cust:other.customers) {
+            customers.push_back(cust->clone());
         }
 
-        for (BaseAction *a:other.actionsLog) {
-            actionsLog.push_back(a->clone());
+        for (BaseAction *act:other.actionsLog) {
+            actionsLog.push_back(act->clone());
         }
     }
 
     return *this;
 }
+
+// Move assignmet 
+WareHouse &WareHouse::operator=(const WareHouse &&other) {
+    if (this != &other) {
+        freeResources();
+        isOpen = other.isOpen;
+        customerCounter = other.customerCounter;
+        volunteerCounter = other.volunteerCounter;
+        orderCounter = other.orderCounter;
+
+        for (Order *order:other.pendingOrders) {
+            pendingOrders.push_back(order);
+        }
+
+        for (Order *order:other.inProcessOrders) {
+            inProcessOrders.push_back(order);
+        }
+
+        for (Order *order:other.completedOrders) {
+            completedOrders.push_back(order);
+        }
+
+        for (Volunteer *vol:other.volunteers) {
+            volunteers.push_back(vol);
+        }
+
+        for (Customer *cust:other.customers) {
+            customers.push_back(cust);
+        }
+
+        for (BaseAction *act:other.actionsLog) {
+            actionsLog.push_back(act);
+        }
+    }
+
+    return *this;
+}
+
+
 
 void WareHouse::freeResources() {
     for (Order *o:pendingOrders) {
@@ -403,7 +478,7 @@ void WareHouse::start() {
         if (split[0] == "close") {
             Close* close = new Close();
             close->act(*this);
-            return; // ends the start loop to close the program
+            
         }
 
         if (split[0] == "backup") {
@@ -415,6 +490,7 @@ void WareHouse::start() {
         if (split[0] == "restore") {
             RestoreWareHouse* restore = new RestoreWareHouse();
             restore->act(*this);
+            delete restore; //this action should never be printed in the log therefore we dont add it to the vector and we need to release the memory here
             continue;
         }
 
