@@ -2,7 +2,7 @@
 all:link
 
 link:compile
-	g++ -o bin/main bin/Customer.o bin/Volunteer.o bin/Warehouse.o bin/Order.o bin/Action.o bin/main.o
+	g++ -o bin/warehouse bin/Customer.o bin/Volunteer.o bin/Warehouse.o bin/Order.o bin/Action.o bin/main.o
 
 compile: src/Customer.cpp src/Volunteer.cpp src/Warehouse.cpp src/Order.cpp src/Action.cpp src/main.cpp
 	g++ -g -Wall -Weffc++ -std=c++11 -c -Iinclude -o bin/Customer.o src/Customer.cpp
